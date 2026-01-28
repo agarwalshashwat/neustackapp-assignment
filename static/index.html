@@ -189,6 +189,34 @@
             
             <h3 style="margin-top: 20px;">📦 Recent Order Result</h3>
             <pre id="order-result">No order yet</pre>
+
+            <div class="admin" style="margin-top: 20px;">
+                <h2>🧠 ML Enrollment Predictor</h2>
+                <div id="ml-form">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <input type="number" id="ml-age" placeholder="Age" value="35">
+                        <input type="number" id="ml-salary" placeholder="Salary" value="75000">
+                        <select id="ml-dependents" style="padding: 10px; border-radius: 6px; border: 1px solid #ddd;">
+                            <option value="Yes">Has Dependents</option>
+                            <option value="No">No Dependents</option>
+                        </select>
+                        <input type="number" id="ml-tenure" placeholder="Tenure (Years)" value="5">
+                        <select id="ml-gender" style="padding: 10px; border-radius: 6px; border: 1px solid #ddd;">
+                            <option value="Female">Female</option>
+                            <option value="Male">Male</option>
+                            <option value="Non-binary">Non-binary</option>
+                        </select>
+                        <select id="ml-region" style="padding: 10px; border-radius: 6px; border: 1px solid #ddd;">
+                            <option value="North">North</option>
+                            <option value="South">South</option>
+                            <option value="East">East</option>
+                            <option value="West">West</option>
+                        </select>
+                    </div>
+                    <button onclick="predictEnrollment()" style="margin-top: 15px; width: 100%;" class="checkout-btn">✨ Predict Enrollment</button>
+                    <div id="ml-result" style="margin-top: 15px; font-weight: bold; text-align: center;"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -283,6 +311,36 @@
                 <p>Total Discount: $${data.total_discount_amount.toFixed(2)}</p>
                 <p>Codes: ${data.discount_codes.join(', ') || 'None'}</p>
             `;
+        }
+
+        async function predictEnrollment() {
+            const payload = {
+                age: parseInt(document.getElementById('ml-age').value),
+                salary: parseFloat(document.getElementById('ml-salary').value),
+                has_dependents: parseInt(document.getElementById('ml-dependents').value),
+                tenure_years: parseInt(document.getElementById('ml-tenure').value),
+                gender: document.getElementById('ml-gender').value,
+                marital_status: "Single", // Default for placeholder
+                employment_type: "Full-time", // Default for placeholder
+                region: document.getElementById('ml-region').value
+            };
+
+            const res = await fetch('/predict-enrollment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            const resultDiv = document.getElementById('ml-result');
+            if (res.ok) {
+                const color = data.will_enroll ? '#27ae60' : '#e74c3c';
+                resultDiv.style.color = color;
+                resultDiv.innerHTML = `Probability: ${(data.enrolled_probability * 100).toFixed(2)}% <br> 
+                                       Prediction: ${data.will_enroll ? "High Likelihood to Enroll" : "Unlikely to Enroll"}`;
+            } else {
+                resultDiv.innerHTML = "Error: " + data.detail;
+            }
         }
 
         fetchInventory();

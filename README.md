@@ -1,42 +1,59 @@
-# Ecommerce Store Assignment
+# 🛡️ Insurance Store & Enrollment Predictor
 
-This is a simple ecommerce store implementation with FastAPI and an in-memory store.
+This is a modern insurance ecommerce platform built with FastAPI, combining a checkout system with machine learning to predict customer enrollment behavior.
 
-## Features
-- List items and add to cart.
-- Checkout with optional discount code.
-- Admin API to generate discount codes for every $n$th order (default is $n=5$).
-- Admin API to view store statistics.
-- Simple HTML/JS frontend.
+## ✨ Features
+- **Digital Policy Store**: Browse insurance plans and add them to your cart.
+- **Dynamic Discounts**: Automatic 10% discount codes generated for every $n$th order ($n=5$).
+- **Admin Dashboard**: Real-time tracking of sales, items sold, and active discount codes.
+- **ML Enrollment Predictor**: Predicts the likelihood of an employee enrolling in a policy based on demographic data.
+- **Interactive UI**: Clean, responsive frontend with policy management and prediction tools.
 
-## Setup
+## 🛠️ Setup & Installation
 
-1. **Install dependencies and run**:
+1. **Environment Setup**:
    ```bash
    uv venv
    source .venv/bin/activate
    uv pip install -r requirements.txt
-   uv run python main.py
    ```
-   The application will be available at [http://localhost:8008](http://localhost:8008).
 
-2. **Running Tests**:
+2. **ML Pipeline (Data & Training)**:
+   Generate the synthetic employee dataset (~10k rows) and train the Random Forest model:
+   ```bash
+   python generate_data.py
+   python train_model.py
+   ```
+
+3. **Launch the Application**:
+   ```bash
+   python main.py
+   ```
+   Visit the platform at [http://localhost:8008](http://localhost:8008).
+
+4. **Running Unit Tests**:
    ```bash
    pytest
    ```
 
-## APIs
+## 🧠 Machine Learning Component
+The project includes a predictive model to help the business understand enrollment drivers.
+- **Model**: Random Forest Classifier.
+- **Dataset**: `employee_data.csv` (features: age, salary, tenure, dependents, etc.).
+- **Report**: See [report.md](report.md) for data insights and evaluation results.
 
-### Store APIs
-- `GET /items`: List all available items.
-- `POST /checkout`: Place an order. Accepts a list of item IDs, quantities, and an optional discount code.
+## 📡 API Reference
+
+### Store & ML APIs
+- `GET /items`: List all available insurance policies.
+- `POST /checkout`: Process orders with optional discount codes.
+- `POST /predict-enrollment`: Get ML-based enrollment probability.
 
 ### Admin APIs
-- `POST /admin/generate-discount`: Generates a 10% discount code if the next order is an $n$th order.
-- `GET /admin/stats`: Get summary of total items, total amount, discount codes, and discount amounts.
+- `POST /admin/generate-discount`: Manual triggers for code generation (per nth rules).
+- `GET /admin/stats`: Business metrics and discount history.
 
-## Assumptions
-- In-memory storage is used; data resets on server restart.
-- $N$ is set to 5 by default in `main.py`.
-- Discount code applies 10% to the entire order.
-- Each generated discount code can only be used once.
+## 📝 Assumptions
+- For testing purposes, $n$ is set to 5.
+- Store data is kept in-memory; restart clears history.
+- The ML model is pre-trained and loaded on server startup.

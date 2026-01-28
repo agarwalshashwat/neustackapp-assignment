@@ -4,9 +4,17 @@ from fastapi.responses import FileResponse
 from typing import List, Optional, Dict
 import uuid
 import os
-from models import Item, CartItem, Order, Stats, CheckoutRequest
+import joblib
+import pandas as pd
+from models import Item, CartItem, Order, Stats, CheckoutRequest, EnrollmentPredictionRequest, EnrollmentPredictionResponse
 
 app = FastAPI(title="Ecommerce API")
+
+# Load ML Model
+MODEL_PATH = "enrollment_model.joblib"
+enrollment_model = None
+if os.path.exists(MODEL_PATH):
+    enrollment_model = joblib.load(MODEL_PATH)
 
 # Serve static files
 static_dir = os.path.join(os.path.dirname(__file__), "static")
@@ -133,6 +141,26 @@ async def get_stats():
         discount_codes=used_discount_codes + valid_discount_codes,
         total_discount_amount=total_discount
     )
+
+# --- ML APIs ---
+
+@app.post("/predict-enrollment", response_model=EnrollmentPredictionResponse)
+async def predict_enrollment(request: EnrollmentPredictionRequest):
+    if enrollment_model is None:
+        raise HTTPException(status_code=503, detail="ML Model not available. Please train the model first.")
+    
+    # Convert request to DataFrame for the pipeline
+    data = pd.DataFrame([request.model_dump()])
+    
+    try:
+        prob = enrollment_model.predict_proba(data)[0][1]
+        prediction = bool(enrollment_model.predict(data)[0])
+        return EnrollmentPredictionResponse(
+            enrolled_probability=round(prob, 4),
+            will_enroll=prediction
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
