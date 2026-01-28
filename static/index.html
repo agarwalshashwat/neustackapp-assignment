@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance Store</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f7fa;
+            color: #2c3e50;
+        }
+        h1 { 
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #34495e;
+            font-size: 1.3em;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        h3 {
+            color: #34495e;
+            font-size: 1.1em;
+            margin-top: 0;
+        }
+        .grid { 
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        .card { 
+            background: white;
+            border: 1px solid #e0e6ed;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: box-shadow 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .card strong {
+            color: #2c3e50;
+            flex: 1;
+        }
+        .admin { 
+            background: white;
+            border: 1px solid #e0e6ed;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        button { 
+            cursor: pointer;
+            padding: 10px 16px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s, transform 0.1s;
+            margin-right: 8px;
+        }
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .checkout-btn {
+            background: #27ae60;
+            padding: 12px 24px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .checkout-btn:hover {
+            background: #229954;
+        }
+        input { 
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-right: 8px;
+            width: 100%;
+            max-width: 250px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        pre { 
+            background: #f8f9fa;
+            border: 1px solid #e0e6ed;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.5;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .cart-section, .inventory-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e6ed;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        #cart-content {
+            min-height: 50px;
+            margin: 15px 0;
+            color: #666;
+        }
+        #cart-content div {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        #cart-content div:last-child {
+            border-bottom: none;
+        }
+        .subtotal {
+            font-size: 1.2em;
+            color: #2c3e50;
+            margin: 15px 0;
+            padding-top: 10px;
+            border-top: 2px solid #e0e6ed;
+        }
+        .stats-content p {
+            margin: 10px 0;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #3498db;
+            padding-left: 12px;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🛡️ Insurance Store</h1>
+    
+    <div class="grid">
+        <div>
+            <div class="inventory-section">
+                <h2>📋 Available Policies</h2>
+                <div id="inventory"></div>
+            </div>
+            
+            <div class="cart-section">
+                <h2>🛒 Your Cart</h2>
+                <div id="cart-content">Empty</div>
+                <p class="subtotal"><strong>Subtotal: $<span id="cart-subtotal">0</span></strong></p>
+                
+                <input type="text" id="discount-input" placeholder="Enter Coupon Code (Optional)">
+                <button class="checkout-btn" onclick="checkout()">💳 Checkout</button>
+            </div>
+        </div>
+        
+        <div>
+            <div class="admin">
+                <h2>⚙️ Admin Panel</h2>
+                <div style="margin-bottom: 20px;">
+                    <button onclick="generateDiscount()">🎟️ Generate Discount Code</button>
+                    <button onclick="fetchStats()">🔄 Refresh Stats</button>
+                </div>
+                <h3>📊 Statistics</h3>
+                <div id="stats-content" class="stats-content">Loading stats...</div>
+            </div>
+            
+            <h3 style="margin-top: 20px;">📦 Recent Order Result</h3>
+            <pre id="order-result">No order yet</pre>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = ""; // Relative to server
+        let cart = [];
+        let inventory = [];
+
+        async function fetchInventory() {
+            const res = await fetch('/items');
+            inventory = await res.json();
+            const div = document.getElementById('inventory');
+            div.innerHTML = inventory.map(item => `
+                <div class="card">
+                    <strong>${item.name}</strong>
+                    <span style="color: #27ae60; font-weight: bold; margin-right: 10px;">$${item.price}</span>
+                    <button onclick="addToCart('${item.id}')">+ Add</button>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(id) {
+            const item = inventory.find(i => i.id === id);
+            const inCart = cart.find(i => i.item_id === id);
+            if (inCart) {
+                inCart.quantity++;
+            } else {
+                cart.push({ item_id: id, quantity: 1, name: item.name, price: item.price });
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const div = document.getElementById('cart-content');
+            const subtotalSpan = document.getElementById('cart-subtotal');
+            if (cart.length === 0) {
+                div.innerHTML = "Empty";
+                subtotalSpan.innerText = "0";
+                return;
+            }
+            div.innerHTML = cart.map(item => `
+                <div><strong>${item.name}</strong> × ${item.quantity} <span style="float: right; color: #27ae60;">$${(item.price * item.quantity).toFixed(2)}</span></div>
+            `).join('');
+            const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            subtotalSpan.innerText = subtotal.toFixed(2);
+        }
+
+        async function checkout() {
+            const code = document.getElementById('discount-input').value;
+            const payload = {
+                items: cart.map(i => ({ item_id: i.item_id, quantity: i.quantity })),
+                discount_code: code || null
+            };
+            
+            const res = await fetch('/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            const result = await res.json();
+            document.getElementById('order-result').innerText = JSON.stringify(result, null, 2);
+            
+            if (res.ok) {
+                cart = [];
+                renderCart();
+                document.getElementById('discount-input').value = "";
+                fetchStats();
+            } else {
+                alert(result.detail || "Checkout failed");
+            }
+        }
+
+        async function generateDiscount() {
+            const res = await fetch('/admin/generate-discount', { method: 'POST' });
+            const result = await res.json();
+            if (res.ok) {
+                alert("New Code: " + result.discount_code);
+                document.getElementById('discount-input').value = result.discount_code;
+                fetchStats();
+            } else {
+                alert(result.detail);
+            }
+        }
+
+        async function fetchStats() {
+            const res = await fetch('/admin/stats');
+            const data = await res.json();
+            document.getElementById('stats-content').innerHTML = `
+                <p>Items Purchased: ${data.total_items_purchased}</p>
+                <p>Total Purchase: $${data.total_purchase_amount.toFixed(2)}</p>
+                <p>Total Discount: $${data.total_discount_amount.toFixed(2)}</p>
+                <p>Codes: ${data.discount_codes.join(', ') || 'None'}</p>
+            `;
+        }
+
+        fetchInventory();
+        fetchStats();
+    </script>
+</body>
+</html>

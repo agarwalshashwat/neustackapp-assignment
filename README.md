@@ -1,36 +1,42 @@
-# Assignment
+# Ecommerce Store Assignment
 
-You are designing an ecommerce store. Clients can add items to their cart and checkout to successfully place an order. Every *n*th order gets a coupon code for 10% discount and can apply to their cart. 
+This is a simple ecommerce store implementation with FastAPI and an in-memory store.
 
-We would like you to design and implement APIs for adding items to cart and checkout functionality. The checkout API would validate if the discount code is valid before giving the discount. 
+## Features
+- List items and add to cart.
+- Checkout with optional discount code.
+- Admin API to generate discount codes for every $n$th order (default is $n=5$).
+- Admin API to view store statistics.
+- Simple HTML/JS frontend.
 
-Building a UI that showcases the functionality is a stretch goal. If you are primarily a backend engineer, you can also submit postman or REST client or equivalent.
+## Setup
 
-The store also has two admin API's:
-1. Generate a discount code if the condition above is satisfied.
-2. Lists count of items purchased, total purchase amount, list of discount codes and total discount amount. 
+1. **Install dependencies and run**:
+   ```bash
+   uv venv
+   source .venv/bin/activate
+   uv pip install -r requirements.txt
+   uv run python main.py
+   ```
+   The application will be available at [http://localhost:8008](http://localhost:8008).
 
-You can build this with a technology stack that you are comfortable with. You would push the code to your github repo and share the link once its complete. We would like to see your commits that show progression and thought process as to how you are completing the exercise. 
+2. **Running Tests**:
+   ```bash
+   pytest
+   ```
 
-Things that you will be evaluated on:
+## APIs
 
-1.	Functional code
-2.	Code quality
-3.	UI in a framework of your choice
-4.	Code comments, readme docs
-5.	Unit tests
+### Store APIs
+- `GET /items`: List all available items.
+- `POST /checkout`: Place an order. Accepts a list of item IDs, quantities, and an optional discount code.
 
-Assumptions you can make:
-1.	The API’s don’t need a backend store. It can be an in-memory store.
+### Admin APIs
+- `POST /admin/generate-discount`: Generates a 10% discount code if the next order is an $n$th order.
+- `GET /admin/stats`: Get summary of total items, total amount, discount codes, and discount amounts.
 
-
-## FAQ:
-**Q**: Can a discount code be used multiple times?
-
-**A**: Discount code can be requested by every user, but is made available for every nth order only. The discount code can be used only once before the next one becomes available on the next nth order.
-
-**Q**: Does the discount code apply to one item?
-
-**A**: Discount code applies to the entire order.
-
-All the best!
+## Assumptions
+- In-memory storage is used; data resets on server restart.
+- $N$ is set to 5 by default in `main.py`.
+- Discount code applies 10% to the entire order.
+- Each generated discount code can only be used once.
