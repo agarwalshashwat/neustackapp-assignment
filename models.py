@@ -14,6 +14,11 @@ class Cart(BaseModel):
     items: List[CartItem] = []
     discount_code: Optional[str] = None
 
+class CartResponse(BaseModel):
+    cart_id: str
+    items: List[CartItem]
+    subtotal: float
+
 class Order(BaseModel):
     id: str
     items: List[CartItem]

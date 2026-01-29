@@ -1,14 +1,29 @@
 import pytest
 from fastapi.testclient import TestClient
-from main import app, orders, valid_discount_codes, used_discount_codes
+from main import app, orders, valid_discount_codes, used_discount_codes, carts
 
 client = TestClient(app)
 
 def setup_function():
-    """Clear order history and codes before each test."""
+    """Clear order history, carts and codes before each test."""
     orders.clear()
     valid_discount_codes.clear()
     used_discount_codes.clear()
+    carts.clear()
+
+def test_cart_apis():
+    # Create cart
+    res = client.post("/cart")
+    assert res.status_code == 200
+    cart_id = res.json()["cart_id"]
+    
+    # Add item
+    res = client.post(f"/cart/{cart_id}/add", json={"item_id": "1", "quantity": 2})
+    assert res.status_code == 200
+    data = res.json()
+    assert len(data["items"]) == 1
+    assert data["items"][0]["quantity"] == 2
+    assert data["subtotal"] == 1000.0
 
 def test_checkout_no_discount():
     payload = {

@@ -15,10 +15,6 @@ env/
 *.swp
 *.swo
 
-# Project specific
-requirements.txt
-# (Wait, usually requirements.txt is kept, but since I generated it, I'll keep it)
-
 # OS specifics
 .DS_Store
 Thumbs.db

@@ -46,8 +46,21 @@ The project includes a predictive model to help the business understand enrollme
 
 ### Store & ML APIs
 - `GET /items`: List all available insurance policies.
+- `POST /cart`: Initialize a new server-side cart.
+- `POST /cart/{cart_id}/add`: Add items to a specific cart.
 - `POST /checkout`: Process orders with optional discount codes.
 - `POST /predict-enrollment`: Get ML-based enrollment probability.
+
+### Admin APIs
+- `POST /admin/generate-discount`: Generate a 10% discount code (available every $n$th order).
+- `GET /admin/stats`: Get store performance statistics.
+
+## 🛡️ Production Readiness
+- **Thread Safety**: Uses threading locks to ensure consistency of in-memory stores during concurrent requests.
+- **Logging**: Structured logging implemented for tracking transactions and errors.
+- **Validation**: Strict Pydantic models for all request/response schemas.
+- **Configuration**: interval ($n$) and discount percentage can be tuned via environment variables.
+- **Testing**: Suite of unit tests covering the order lifecycle and discount logic.
 
 ### Admin APIs
 - `POST /admin/generate-discount`: Manual triggers for code generation (per nth rules).
