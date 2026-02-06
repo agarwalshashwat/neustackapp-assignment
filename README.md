@@ -1,72 +1,77 @@
-# 🛡️ Insurance Store & Enrollment Predictor
+# � Ecommerce Store API
 
-This is a modern insurance ecommerce platform built with FastAPI, combining a checkout system with machine learning to predict customer enrollment behavior.
+A clean, high-performance ecommerce store backend built with FastAPI. This system handles cart management, checkouts, and a reward-based discount system.
 
 ## ✨ Features
-- **Digital Policy Store**: Browse insurance plans and add them to your cart.
-- **Dynamic Discounts**: Automatic 10% discount codes generated for every $n$th order ($n=5$).
-- **Admin Dashboard**: Real-time tracking of sales, items sold, and active discount codes.
-- **ML Enrollment Predictor**: Predicts the likelihood of an employee enrolling in a policy based on demographic data.
-- **Interactive UI**: Clean, responsive frontend with policy management and prediction tools.
+- **Product Inventory**: Browse available products and add them to your cart.
+- **Cart Management**: Server-side cart persistence using unique session IDs.
+- **Dynamic Discount System**: Admins can generate 10% discount codes for every $n$th order ($n=5$ by default).
+- **Admin Dashboard**: Real-time tracking of items sold, total revenue, and discount statistics.
+- **Interactive UI**: Clean, responsive frontend dashboard to test all API functionalities.
 
 ## 🛠️ Setup & Installation
 
 1. **Environment Setup**:
    ```bash
-   uv venv
-   source .venv/bin/activate
-   uv pip install -r requirements.txt
+   python -m venv venv
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   pip install -r requirements.txt
    ```
 
-2. **ML Pipeline (Data & Training)**:
-   Generate the synthetic employee dataset (~10k rows) and train the Random Forest model:
-   ```bash
-   python generate_data.py
-   python train_model.py
-   ```
-
-3. **Launch the Application**:
+2. **Launch the Application**:
    ```bash
    python main.py
    ```
    Visit the platform at [http://localhost:8008](http://localhost:8008).
 
-4. **Running Unit Tests**:
+### 🐳 Running with Docker
+
+If you prefer to run the application in a containerized environment:
+
+1. **Build the Image**:
+   ```bash
+   docker build -t ecommerce-store .
+   ```
+
+2. **Run the Container**:
+   ```bash
+   docker run -p 8008:8008 ecommerce-store
+   ```
+
+### 🛠️ Running with Docker Compose
+
+For a more streamlined experience with environment configuration:
+
+1. **Start the Service**:
+   ```bash
+   docker-compose up --build
+   ```
+
+The API will be available at [http://localhost:8008](http://localhost:8008).
+
+3. **Running Unit Tests**:
    ```bash
    pytest
    ```
 
-## 🧠 Machine Learning Component
-The project includes a predictive model to help the business understand enrollment drivers.
-- **Model**: Random Forest Classifier.
-- **Dataset**: `employee_data.csv` (features: age, salary, tenure, dependents, etc.).
-- **Report**: See [report.md](report.md) for data insights and evaluation results.
-
 ## 📡 API Reference
 
-### Store & ML APIs
-- `GET /items`: List all available insurance policies.
-- `POST /cart`: Initialize a new server-side cart.
+### Shopping APIs
+- `GET /items`: List all available products in inventory.
+- `POST /cart`: Initialize a new shopping cart.
 - `POST /cart/{cart_id}/add`: Add items to a specific cart.
 - `POST /checkout`: Process orders with optional discount codes.
-- `POST /predict-enrollment`: Get ML-based enrollment probability.
 
 ### Admin APIs
-- `POST /admin/generate-discount`: Generate a 10% discount code (available every $n$th order).
-- `GET /admin/stats`: Get store performance statistics.
+- `POST /admin/generate-discount`: Generate a discount code (available for every $n$th order).
+- `GET /admin/stats`: Get store performance statistics (revenue, items sold, etc.).
 
-## 🛡️ Production Readiness
+## 🛡️ Architecture & Design
 - **Thread Safety**: Uses threading locks to ensure consistency of in-memory stores during concurrent requests.
-- **Logging**: Structured logging implemented for tracking transactions and errors.
 - **Validation**: Strict Pydantic models for all request/response schemas.
-- **Configuration**: interval ($n$) and discount percentage can be tuned via environment variables.
-- **Testing**: Suite of unit tests covering the order lifecycle and discount logic.
+- **Design Decisions**: Detailed architectural choices can be found in [DECISIONS.md](DECISIONS.md).
 
-### Admin APIs
-- `POST /admin/generate-discount`: Manual triggers for code generation (per nth rules).
-- `GET /admin/stats`: Business metrics and discount history.
-
-## 📝 Assumptions
-- For testing purposes, $n$ is set to 5.
-- Store data is kept in-memory; restart clears history.
-- The ML model is pre-trained and loaded on server startup.
+## 📝 Configuration
+The following can be configured via environment variables:
+- `DISCOUNT_ORDER_INTERVAL`: The order frequency ($n$) for discount eligibility (default: 5).
+- `DISCOUNT_PERCENTAGE`: The discount value (default: 0.10 for 10%).

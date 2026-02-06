@@ -1,0 +1,9 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8008:8008"
+    environment:
+      - DISCOUNT_ORDER_INTERVAL=5
+      - DISCOUNT_PERCENTAGE=0.10
+    restart: unless-stopped
